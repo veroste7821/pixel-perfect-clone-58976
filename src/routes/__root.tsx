@@ -62,6 +62,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Suite de gestión de turnos para estudios y salones." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Aurora · Agenda Inteligente" },
+      { name: "twitter:description", content: "Suite de gestión de turnos para estudios y salones." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8b327dea-737e-4583-a2e7-bc2b705fcfea/id-preview-75d53de6--f245739f-a69b-4492-95bd-03fb9f757e5b.lovable.app-1781204295967.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8b327dea-737e-4583-a2e7-bc2b705fcfea/id-preview-75d53de6--f245739f-a69b-4492-95bd-03fb9f757e5b.lovable.app-1781204295967.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
