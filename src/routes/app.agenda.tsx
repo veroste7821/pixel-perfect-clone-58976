@@ -55,9 +55,9 @@ function Agenda() {
     mutationFn: async (t: any) => {
       if (t.id) {
         const { id, clientes: _c, servicios: _s, ...rest } = t;
-        return supabase.from("turnos").update(rest).eq("id", id).throwOnError();
+        return supabase.from("turnos").update(rest as any).eq("id", id).throwOnError();
       }
-      return supabase.from("turnos").insert(t).throwOnError();
+      return supabase.from("turnos").insert(t as any).throwOnError();
     },
     onSuccess: () => { qc.invalidateQueries(); toast.success("Turno guardado"); setEditing(null); },
     onError: (e: any) => toast.error(e.message ?? "Error al guardar"),
