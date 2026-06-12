@@ -65,7 +65,7 @@ function Agenda() {
 
   const changeEstado = useMutation({
     mutationFn: async ({ id, estado }: { id: string; estado: string }) =>
-      supabase.from("turnos").update({ estado }).eq("id", id).throwOnError(),
+      supabase.from("turnos").update({ estado } as any).eq("id", id).throwOnError(),
     onSuccess: () => { qc.invalidateQueries(); toast.success("Estado actualizado"); },
   });
 
