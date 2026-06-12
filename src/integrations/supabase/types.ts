@@ -14,7 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clientes: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          observaciones: string | null
+          telefono: string
+          ultima_visita: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          observaciones?: string | null
+          telefono: string
+          ultima_visita?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          observaciones?: string | null
+          telefono?: string
+          ultima_visita?: string | null
+        }
+        Relationships: []
+      }
+      servicios: {
+        Row: {
+          created_at: string
+          duracion_min: number
+          id: string
+          nombre: string
+          precio: number
+        }
+        Insert: {
+          created_at?: string
+          duracion_min?: number
+          id?: string
+          nombre: string
+          precio?: number
+        }
+        Update: {
+          created_at?: string
+          duracion_min?: number
+          id?: string
+          nombre?: string
+          precio?: number
+        }
+        Relationships: []
+      }
+      turnos: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          estado: Database["public"]["Enums"]["turno_estado"]
+          fecha: string
+          hora: string
+          id: string
+          observaciones: string | null
+          servicio_id: string
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          estado?: Database["public"]["Enums"]["turno_estado"]
+          fecha: string
+          hora: string
+          id?: string
+          observaciones?: string | null
+          servicio_id: string
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          estado?: Database["public"]["Enums"]["turno_estado"]
+          fecha?: string
+          hora?: string
+          id?: string
+          observaciones?: string | null
+          servicio_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turnos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "turnos_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +121,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      turno_estado: "pendiente" | "confirmado" | "completado" | "cancelado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +248,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      turno_estado: ["pendiente", "confirmado", "completado", "cancelado"],
+    },
   },
 } as const
