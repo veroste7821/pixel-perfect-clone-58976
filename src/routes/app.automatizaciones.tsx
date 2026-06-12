@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, Clock, MessageCircle, BellRing, Sparkles, Heart, ArrowRight } from "lucide-react";
 
@@ -71,8 +72,8 @@ function Automatizaciones() {
 
             <div className="mt-5 grid items-center gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
               {f.steps.map((s, i) => (
-                <>
-                  <div key={s.label} className="rounded-md border border-border bg-secondary/40 p-3">
+                <Fragment key={s.label}>
+                  <div className="rounded-md border border-border bg-secondary/40 p-3">
                     <div className="flex items-center gap-2">
                       <s.icon className="h-3.5 w-3.5 text-primary" />
                       <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{s.label}</p>
@@ -80,9 +81,9 @@ function Automatizaciones() {
                     <p className="mt-1 text-sm font-medium">{s.detail}</p>
                   </div>
                   {i < f.steps.length - 1 && (
-                    <ArrowRight key={`arrow-${i}`} className="hidden h-4 w-4 text-muted-foreground sm:block" />
+                    <ArrowRight className="hidden h-4 w-4 text-muted-foreground sm:block" />
                   )}
-                </>
+                </Fragment>
               ))}
             </div>
           </div>
