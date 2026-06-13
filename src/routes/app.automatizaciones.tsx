@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Clock, MessageCircle, BellRing, Sparkles, Heart, ArrowRight } from "lucide-react";
+import { CheckCircle2, Clock, MessageCircle, BellRing, Sparkles, Heart, ArrowRight, Send, CalendarCheck2 } from "lucide-react";
 
 export const Route = createFileRoute("/app/automatizaciones")({
   head: () => ({ meta: [{ title: "Automatizaciones · Agenda IA" }] }),
@@ -8,6 +8,17 @@ export const Route = createFileRoute("/app/automatizaciones")({
 });
 
 const flows = [
+  {
+    title: "Solicitud de turno por Telegram",
+    desc: "El cliente escribe al bot pidiendo turno y recibe el link directo a la agenda online.",
+    icon: Send,
+    active: true,
+    steps: [
+      { icon: MessageCircle, label: "Trigger", detail: "Mensaje en Telegram" },
+      { icon: Sparkles, label: "Acción", detail: "Detectar solicitud de turno" },
+      { icon: CalendarCheck2, label: "Envío", detail: "Link a la agenda (/reservar)" },
+    ],
+  },
   {
     title: "Confirmación automática",
     desc: "Al crearse el turno, el cliente recibe el detalle por WhatsApp.",
