@@ -28,6 +28,7 @@ function Agenda() {
   const qc = useQueryClient();
   const [weekStart, setWeekStart] = useState(startOfWeek());
   const [editing, setEditing] = useState<Partial<Turno> | null>(null);
+  const [focusReschedule, setFocusReschedule] = useState(false);
 
   const week = useMemo(() => Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(d.getDate()+i); return d; }), [weekStart]);
   const from = fmtISO(week[0]); const to = fmtISO(week[6]);
