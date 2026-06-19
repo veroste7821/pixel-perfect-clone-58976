@@ -149,9 +149,17 @@ function Agenda() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setEditing(null)}>
           <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{editing.id ? "Editar turno" : "Nuevo turno"}</h2>
+              <h2 className="text-lg font-semibold">
+                {editing.id ? (focusReschedule ? "Reagendar turno" : "Editar turno") : "Nuevo turno"}
+              </h2>
               <button onClick={() => setEditing(null)} className="rounded-md p-1 hover:bg-accent"><X className="h-4 w-4" /></button>
             </div>
+
+            {focusReschedule && editing.id && (
+              <p className="mt-2 rounded-md bg-primary/10 px-3 py-2 text-xs text-primary">
+                Elegí la nueva fecha y hora. El cliente recibirá una notificación por WhatsApp.
+              </p>
+            )}
 
             <form className="mt-4 grid gap-3" onSubmit={(e) => { e.preventDefault(); upsert.mutate(editing); }}>
               <div>
@@ -168,10 +176,10 @@ function Agenda() {
                   {servicios.map((s: any) => <option key={s.id} value={s.id}>{s.nombre} · {s.duracion_min}min · ${s.precio}</option>)}
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={`grid grid-cols-2 gap-3 ${focusReschedule ? "rounded-md ring-2 ring-primary/40 p-2 -m-2" : ""}`}>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">Fecha</label>
-                  <input type="date" required value={editing.fecha ?? ""} onChange={(e) => setEditing({ ...editing, fecha: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                  <input type="date" required value={editing.fecha ?? ""} onChange={(e) => setEditing({ ...editing, fecha: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" autoFocus={focusReschedule} />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">Hora</label>
@@ -194,13 +202,13 @@ function Agenda() {
                   {editing.id && (
                     <>
                       <button type="button" onClick={() => changeEstado.mutate({ id: editing.id!, estado: "completado" })} className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-2.5 py-1.5 text-xs hover:bg-accent"><Check className="h-3.5 w-3.5" /> Completar</button>
-                      <button type="button" onClick={() => changeEstado.mutate({ id: editing.id!, estado: "cancelado" })} className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-2.5 py-1.5 text-xs hover:bg-accent">Cancelar</button>
-                      <button type="button" onClick={() => { if (confirm("Eliminar turno?")) { remove.mutate(editing.id!); setEditing(null); } }} className="inline-flex items-center gap-1 rounded-md border border-destructive/30 px-2.5 py-1.5 text-xs text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /> Eliminar</button>
+                      <button type="button" onClick={() => { if (confirm("¿Cancelar este turno?")) { changeEstado.mutate({ id: editing.id!, estado: "cancelado" }); setEditing(null); } }} className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-background px-2.5 py-1.5 text-xs text-destructive hover:bg-destructive/10"><Ban className="h-3.5 w-3.5" /> Cancelar turno</button>
+                      <button type="button" onClick={() => { if (confirm("¿Eliminar definitivamente?")) { remove.mutate(editing.id!); setEditing(null); } }} className="inline-flex items-center gap-1 rounded-md border border-destructive/30 px-2.5 py-1.5 text-xs text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /> Eliminar</button>
                     </>
                   )}
                 </div>
                 <button type="submit" className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                  <Pencil className="h-3.5 w-3.5" /> Guardar
+                  <Pencil className="h-3.5 w-3.5" /> {focusReschedule ? "Confirmar nueva fecha" : "Guardar"}
                 </button>
               </div>
             </form>
