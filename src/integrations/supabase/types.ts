@@ -41,6 +41,33 @@ export type Database = {
         }
         Relationships: []
       }
+      horarios: {
+        Row: {
+          activo: boolean
+          created_at: string
+          dia_semana: number
+          hora_fin: string
+          hora_inicio: string
+          id: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          dia_semana: number
+          hora_fin: string
+          hora_inicio: string
+          id?: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          dia_semana?: number
+          hora_fin?: string
+          hora_inicio?: string
+          id?: string
+        }
+        Relationships: []
+      }
       servicios: {
         Row: {
           created_at: string
