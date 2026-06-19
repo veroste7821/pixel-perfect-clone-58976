@@ -110,14 +110,34 @@ function Agenda() {
               <div className="space-y-2 p-2 min-h-[120px]">
                 {items.length === 0 && <p className="px-1 py-3 text-center text-[11px] text-muted-foreground">—</p>}
                 {items.map((t) => (
-                  <button key={t.id} onClick={() => setEditing(t)} className="w-full rounded-md border border-border bg-background p-2 text-left hover:border-primary/40 hover:bg-accent/40">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold tabular-nums">{t.hora.slice(0,5)}</span>
-                      <EstadoBadge estado={t.estado} />
+                  <div key={t.id} className="group rounded-md border border-border bg-background p-2 hover:border-primary/40">
+                    <button onClick={() => { setFocusReschedule(false); setEditing(t); }} className="block w-full text-left">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold tabular-nums">{t.hora.slice(0,5)}</span>
+                        <EstadoBadge estado={t.estado} />
+                      </div>
+                      <p className="mt-1 truncate text-xs font-medium">{t.clientes?.nombre}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{t.servicios?.nombre}</p>
+                    </button>
+                    <div className="mt-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        onClick={() => { setFocusReschedule(true); setEditing(t); }}
+                        title="Reagendar"
+                        className="inline-flex flex-1 items-center justify-center gap-1 rounded border border-input bg-background px-1.5 py-1 text-[10px] hover:bg-accent"
+                      >
+                        <CalendarClock className="h-3 w-3" /> Reagendar
+                      </button>
+                      {t.estado !== "cancelado" && (
+                        <button
+                          onClick={() => { if (confirm("¿Cancelar este turno?")) changeEstado.mutate({ id: t.id, estado: "cancelado" }); }}
+                          title="Cancelar turno"
+                          className="inline-flex items-center justify-center rounded border border-input bg-background px-1.5 py-1 text-[10px] text-destructive hover:bg-destructive/10"
+                        >
+                          <Ban className="h-3 w-3" />
+                        </button>
+                      )}
                     </div>
-                    <p className="mt-1 truncate text-xs font-medium">{t.clientes?.nombre}</p>
-                    <p className="truncate text-[11px] text-muted-foreground">{t.servicios?.nombre}</p>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
