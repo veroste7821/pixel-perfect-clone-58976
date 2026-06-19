@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Check, X, Trash2, Pencil } from "lucide-react";
+import { Plus, Check, X, Trash2, Pencil, CalendarClock, Ban } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { EstadoBadge } from "./app.index";
@@ -28,6 +28,7 @@ function Agenda() {
   const qc = useQueryClient();
   const [weekStart, setWeekStart] = useState(startOfWeek());
   const [editing, setEditing] = useState<Partial<Turno> | null>(null);
+  const [focusReschedule, setFocusReschedule] = useState(false);
 
   const week = useMemo(() => Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(d.getDate()+i); return d; }), [weekStart]);
   const from = fmtISO(week[0]); const to = fmtISO(week[6]);
@@ -109,14 +110,34 @@ function Agenda() {
               <div className="space-y-2 p-2 min-h-[120px]">
                 {items.length === 0 && <p className="px-1 py-3 text-center text-[11px] text-muted-foreground">—</p>}
                 {items.map((t) => (
-                  <button key={t.id} onClick={() => setEditing(t)} className="w-full rounded-md border border-border bg-background p-2 text-left hover:border-primary/40 hover:bg-accent/40">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold tabular-nums">{t.hora.slice(0,5)}</span>
-                      <EstadoBadge estado={t.estado} />
+                  <div key={t.id} className="group rounded-md border border-border bg-background p-2 hover:border-primary/40">
+                    <button onClick={() => { setFocusReschedule(false); setEditing(t); }} className="block w-full text-left">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold tabular-nums">{t.hora.slice(0,5)}</span>
+                        <EstadoBadge estado={t.estado} />
+                      </div>
+                      <p className="mt-1 truncate text-xs font-medium">{t.clientes?.nombre}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{t.servicios?.nombre}</p>
+                    </button>
+                    <div className="mt-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        onClick={() => { setFocusReschedule(true); setEditing(t); }}
+                        title="Reagendar"
+                        className="inline-flex flex-1 items-center justify-center gap-1 rounded border border-input bg-background px-1.5 py-1 text-[10px] hover:bg-accent"
+                      >
+                        <CalendarClock className="h-3 w-3" /> Reagendar
+                      </button>
+                      {t.estado !== "cancelado" && (
+                        <button
+                          onClick={() => { if (confirm("¿Cancelar este turno?")) changeEstado.mutate({ id: t.id, estado: "cancelado" }); }}
+                          title="Cancelar turno"
+                          className="inline-flex items-center justify-center rounded border border-input bg-background px-1.5 py-1 text-[10px] text-destructive hover:bg-destructive/10"
+                        >
+                          <Ban className="h-3 w-3" />
+                        </button>
+                      )}
                     </div>
-                    <p className="mt-1 truncate text-xs font-medium">{t.clientes?.nombre}</p>
-                    <p className="truncate text-[11px] text-muted-foreground">{t.servicios?.nombre}</p>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -128,9 +149,17 @@ function Agenda() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setEditing(null)}>
           <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{editing.id ? "Editar turno" : "Nuevo turno"}</h2>
+              <h2 className="text-lg font-semibold">
+                {editing.id ? (focusReschedule ? "Reagendar turno" : "Editar turno") : "Nuevo turno"}
+              </h2>
               <button onClick={() => setEditing(null)} className="rounded-md p-1 hover:bg-accent"><X className="h-4 w-4" /></button>
             </div>
+
+            {focusReschedule && editing.id && (
+              <p className="mt-2 rounded-md bg-primary/10 px-3 py-2 text-xs text-primary">
+                Elegí la nueva fecha y hora. El cliente recibirá una notificación por WhatsApp.
+              </p>
+            )}
 
             <form className="mt-4 grid gap-3" onSubmit={(e) => { e.preventDefault(); upsert.mutate(editing); }}>
               <div>
@@ -147,10 +176,10 @@ function Agenda() {
                   {servicios.map((s: any) => <option key={s.id} value={s.id}>{s.nombre} · {s.duracion_min}min · ${s.precio}</option>)}
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={`grid grid-cols-2 gap-3 ${focusReschedule ? "rounded-md ring-2 ring-primary/40 p-2 -m-2" : ""}`}>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">Fecha</label>
-                  <input type="date" required value={editing.fecha ?? ""} onChange={(e) => setEditing({ ...editing, fecha: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                  <input type="date" required value={editing.fecha ?? ""} onChange={(e) => setEditing({ ...editing, fecha: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" autoFocus={focusReschedule} />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">Hora</label>
@@ -173,13 +202,13 @@ function Agenda() {
                   {editing.id && (
                     <>
                       <button type="button" onClick={() => changeEstado.mutate({ id: editing.id!, estado: "completado" })} className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-2.5 py-1.5 text-xs hover:bg-accent"><Check className="h-3.5 w-3.5" /> Completar</button>
-                      <button type="button" onClick={() => changeEstado.mutate({ id: editing.id!, estado: "cancelado" })} className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-2.5 py-1.5 text-xs hover:bg-accent">Cancelar</button>
-                      <button type="button" onClick={() => { if (confirm("Eliminar turno?")) { remove.mutate(editing.id!); setEditing(null); } }} className="inline-flex items-center gap-1 rounded-md border border-destructive/30 px-2.5 py-1.5 text-xs text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /> Eliminar</button>
+                      <button type="button" onClick={() => { if (confirm("¿Cancelar este turno?")) { changeEstado.mutate({ id: editing.id!, estado: "cancelado" }); setEditing(null); } }} className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-background px-2.5 py-1.5 text-xs text-destructive hover:bg-destructive/10"><Ban className="h-3.5 w-3.5" /> Cancelar turno</button>
+                      <button type="button" onClick={() => { if (confirm("¿Eliminar definitivamente?")) { remove.mutate(editing.id!); setEditing(null); } }} className="inline-flex items-center gap-1 rounded-md border border-destructive/30 px-2.5 py-1.5 text-xs text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /> Eliminar</button>
                     </>
                   )}
                 </div>
                 <button type="submit" className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                  <Pencil className="h-3.5 w-3.5" /> Guardar
+                  <Pencil className="h-3.5 w-3.5" /> {focusReschedule ? "Confirmar nueva fecha" : "Guardar"}
                 </button>
               </div>
             </form>
