@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, CalendarDays, Users, MessageCircle, Workflow, Sparkles } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Users, Sparkles } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar,
@@ -9,8 +9,6 @@ const items = [
   { title: "Dashboard", url: "/app", icon: LayoutDashboard, exact: true },
   { title: "Agenda", url: "/app/agenda", icon: CalendarDays },
   { title: "Clientes", url: "/app/clientes", icon: Users },
-  { title: "WhatsApp", url: "/app/whatsapp", icon: MessageCircle },
-  { title: "Automatizaciones", url: "/app/automatizaciones", icon: Workflow },
 ];
 
 export function AppSidebar() {
